@@ -15,10 +15,8 @@ FRAME_STYLE = (wx.FRAME_FLOAT_ON_PARENT | wx.SYSTEM_MENU | wx.CAPTION |
 
 FRAME_DIALOG_STYLE = (wx.FRAME_FLOAT_ON_PARENT | wx.CAPTION |
                       wx.FRAME_NO_TASKBAR)
-FRAME_DIALOG_STYLE2 = (FRAME_DIALOG_STYLE | wx.SYSTEM_MENU | wx.CLOSE_BOX)
-
-FRAME_DIALOG_STYLE3 = (FRAME_DIALOG_STYLE2 | wx.RESIZE_BORDER |
-                       wx.MAXIMIZE_BOX | wx.RESIZE_BOX)
+FRAME_DIALOG_STYLE2 = (wx.FRAME_FLOAT_ON_PARENT | wx.CAPTION | wx.SYSTEM_MENU |
+                       wx.CLOSE_BOX | wx.FRAME_NO_TASKBAR)
 
 
 class GaugeStatusBar(EnhancedStatusBar):
@@ -79,10 +77,6 @@ class GaugeFrame(wx.Frame):
                                   icon | wx.OK | wx.CENTER)
         dialog.ShowModal()
         dialog.Destroy()
-
-    @anythread
-    def setPanelEnable(self, enable=True):
-        self.panel.Enable(enable)
 
 
 if __name__ == '__main__':
