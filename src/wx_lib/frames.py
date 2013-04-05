@@ -4,7 +4,6 @@ Created on 25 Jan 2013
 @author: Dave Wilson
 '''
 
-
 import wx
 from wxAnyThread import anythread
 from enhanced_status_bar import EnhancedStatusBar
