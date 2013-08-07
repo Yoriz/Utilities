@@ -5,7 +5,6 @@ Created on 25 Jan 2013
 '''
 
 import wx
-from wxAnyThread import anythread
 from enhanced_status_bar import EnhancedStatusBar
 
 
@@ -28,24 +27,23 @@ class GaugeStatusBar(EnhancedStatusBar):
         self.SetFieldsCount(2)
         self.SetStatusWidths([-1, 100])
 
-        self.progressGauge = wx.Gauge(self, size=(100, 15))
-        self.progressGauge.Show(False)
-        self.AddWidget(self.progressGauge, pos=1)
+        self.progress_gauge = wx.Gauge(self, size=(100, 15))
+        self.progress_gauge.Show(False)
+        self.AddWidget(self.progress_gauge, pos=1)
 
         self.timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self.onTimer)
+        self.Bind(wx.EVT_TIMER, self._on_timer)
 
-    def onTimer(self, event):
-        self.progressGauge.Pulse()
+    def _on_timer(self, event):
+        self.progress_gauge.Pulse()
 
-    @anythread
-    def pulseGauge(self, pulse=True):
+    def pulse_gauge(self, pulse=True):
         isRunning = self.timer.IsRunning()
         if not isRunning and pulse:
             self.timer.Start(500)
         elif isRunning and not pulse:
             self.timer.Stop()
-        self.progressGauge.Show(pulse)
+        self.progress_gauge.Show(pulse)
 
 
 class GaugeFrame(wx.Frame):
@@ -58,7 +56,7 @@ class GaugeFrame(wx.Frame):
         self.statusBar = GaugeStatusBar(self)
         self.SetStatusBar(self.statusBar)
 
-    def setPanel(self, panel):
+    def set_panel(self, panel):
         self.Freeze()
         self.panel.Destroy()
         self.panel = panel
@@ -66,22 +64,22 @@ class GaugeFrame(wx.Frame):
         self.Layout()
         self.Thaw()
 
-    @anythread
-    def setGaugeAndStatusText(self, pulse=True, statusText=''):
-        self.statusBar.pulseGauge(pulse)
-        self.statusBar.SetStatusText(statusText)
+    def set_gauge_and_status_text(self, pulse=True, status_text=''):
+        self.statusBar.pulse_gauge(pulse)
+        self.statusBar.SetStatusText(status_text)
 
-    @anythread
-    def showErrorDialog(self, titleText, errorText, icon=None):
+    def show_error_dialog(self, title_text, error_text, icon=None):
+#         title_text, error_text = str(title_text), str(error_text)
         if not icon:
             icon = wx.ICON_ERROR
-        dialog = wx.MessageDialog(self, errorText, titleText,
+        elif icon == 'information':
+            icon = wx.ICON_INFORMATION
+        dialog = wx.MessageDialog(self, error_text, title_text,
                                   icon | wx.OK | wx.CENTER)
         dialog.ShowModal()
         dialog.Destroy()
 
-    @anythread
-    def setPanelEnable(self, enable=True):
+    def set_panel_enable(self, enable=True):
         self.panel.Enable(enable)
 
 
@@ -89,5 +87,5 @@ if __name__ == '__main__':
     wx_app = wx.App(None)
     frame = GaugeFrame(None, title='Testing GaugeFrame')
     frame.Show()
-    frame.setGaugeAndStatusText(True, 'Test status')
+    frame.set_gauge_and_status_text(True, 'Test status')
     wx_app.MainLoop()
