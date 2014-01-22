@@ -5,7 +5,7 @@ Created on 25 Jan 2013
 '''
 
 import wx
-from enhanced_status_bar import EnhancedStatusBar
+import enhanced_status_bar
 
 
 FRAME_STYLE = (wx.FRAME_FLOAT_ON_PARENT | wx.SYSTEM_MENU | wx.CAPTION |
@@ -20,7 +20,7 @@ FRAME_DIALOG_STYLE3 = (FRAME_DIALOG_STYLE2 | wx.RESIZE_BORDER |
                        wx.MAXIMIZE_BOX | wx.RESIZE_BOX)
 
 
-class GaugeStatusBar(EnhancedStatusBar):
+class GaugeStatusBar(enhanced_status_bar.EnhancedStatusBar):
     def __init__(self, parent):
         super(GaugeStatusBar, self).__init__(parent, style=wx.SB_FLAT)
         self.SetSize((-1, 23))
@@ -56,6 +56,26 @@ class GaugeFrame(wx.Frame):
         self.statusBar = GaugeStatusBar(self)
         self.SetStatusBar(self.statusBar)
 
+    @classmethod
+    def modal(cls, *args, **kwargs):
+        if not kwargs.get('style'):
+            kwargs['style'] = FRAME_DIALOG_STYLE2
+        gauge_frame = cls(*args, **kwargs)
+        gauge_frame.CenterOnParent()
+        gauge_frame.MakeModal()
+        gauge_frame.Bind(wx.EVT_CLOSE, gauge_frame.close_modal)
+        return gauge_frame
+
+    @classmethod
+    def modal_resize(cls, *args, **kwargs):
+        kwargs['style'] = FRAME_DIALOG_STYLE3
+        return cls.modal(*args, **kwargs)
+
+    def close_modal(self, event):
+        event.Skip()
+        self.MakeModal(False)
+        self.Destroy()
+
     def set_panel(self, panel):
         self.Freeze()
         self.panel.Destroy()
@@ -64,9 +84,15 @@ class GaugeFrame(wx.Frame):
         self.Layout()
         self.Thaw()
 
-    def set_gauge_and_status_text(self, pulse=True, status_text=''):
+    def set_gauge_pulse(self, pulse=True):
         self.statusBar.pulse_gauge(pulse)
+
+    def set_status_text(self, status_text=''):
         self.statusBar.SetStatusText(status_text)
+
+    def set_gauge_and_status_text(self, pulse=True, status_text=''):
+        self.set_gauge_pulse(pulse)
+        self.set_status_text(status_text)
 
     def show_error_dialog(self, title_text, error_text, icon=None):
 #         title_text, error_text = str(title_text), str(error_text)
